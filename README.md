@@ -35,3 +35,17 @@ For the above **Time** class, perform following additional operations:
   ```
 Create a main( ) function to demonstrate the above 3 features of the Time class.
 
+## Task 3 - Operator Overloading
+Create a class named **Alarm** inherited from class **Time** of Tasks 1 & 2 that contains integer data for *volume*, and string for *alarm type*. The volume level can be set from 0 to 5. The alarm type can be set to: "Melody", "Vibration", "Melody+Vibration":
+ * Overload the stream extraction >> operator to set the alarm. e.g.
+ ```
+ Alarm a1;
+ cin >> a1;     // will set alarm a1 according to the user input
+ ```
+ 
+ * Overload subscript operator [ ] that takes integer value to set volume in valid range (0-5). e.g.
+ ```
+ a1[0];  // will mute the alarm
+ a1[5];  // will set the maximum possible volume level
+ ```
+* Write the code for type conversion from **Time** to **Alarm** and vice versa.
