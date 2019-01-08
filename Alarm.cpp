@@ -1,21 +1,27 @@
-#include "Alarm.h"
-#include <string>
-#include<iostream>
-
+#include "Alarm.h"  // class implemented
+#include<string>
 using namespace std;
 
-std::ostream& operator<<(std::ostream& os, const validRing& validRings)
-{
-	switch (validRings)
-	{
-	case Melody: os << "Melody"; break;
-	case Vibration: os << "Vibration"; break;
-	case MelodyAndVibration: os << "MelodyAndVibration"; break;
-	case None: os << "None"; break;
-	}
-	return os;
-}
+// File scope starts here 
 
+/////////////////////////////// PUBLIC ///////////////////////////////////////
+
+//============================= LIFECYCLE ====================================
+
+// Alarm Default+Overloaded Constructor
+Alarm::Alarm(int aHour, int aMinute, int aSecond, int aVolume, const string& aRing) : Time(aHour, aMinute, aSecond), mVolume(aVolume) {
+	this->SetAlarm(aVolume, aRing);
+}
+// end Alarm constructor 
+
+// Alarm Type conversion Constructor
+Alarm::Alarm(const Time& aTime) : Time(aTime), mVolume(0), mAlarmType(None) { }
+// end Alarm constructor 
+
+
+//============================= OPERATORS ====================================
+
+// Stream Extraction
 istream& operator >>(istream& is, Alarm& a)
 {
 	int hr, min, sec, vLevel;
@@ -27,75 +33,120 @@ istream& operator >>(istream& is, Alarm& a)
 	is >> min;
 	cout << "Enter second: ";
 	is >> sec;
-	a.setHour(hr);
-	a.setMinute(min);
-	a.setSecond(sec);
+	a.SetHour(hr);
+	a.SetMinute(min);
+	a.SetSecond(sec);
 
 	cout << "Enter Volume level(0-5): ";
 	is >> vLevel;
-	a.setVolume(vLevel);
+	a.SetVolume(vLevel);
 	cout << "Enter ring tone: ";
 	cin.ignore();
 	getline(cin, ringTone);
-	a.setRing(ringTone);
+	a.SetAlarmType(ringTone);
 
 	return is;
 }
+// end stream extraction
 
-
-Alarm::Alarm(int aHour, int aMinute, int aSecond, int aVolume, string aRing) :Time(aHour, aMinute, aSecond)
-{
-	setRing(aRing);
-	setVolume(aVolume);
-}
-
-// Type conversion constructor
-Alarm::Alarm(const Time & t) :Time(t)
-{
-	setVolume(0);
-	setRing("None");
-}
-void Alarm::displayAlarm()const
-{
-	cout << "Alarm Time: " << getHour() << ":" << getMinute() << ":" << getSecond() << endl;
-	cout << "Volume level: " << Volume << endl;
-	cout << "Ringtone: ";
-	cout << AlarmType << endl;
-}
-void Alarm::setVolume(int aVolume)
-{
-	if (aVolume > 5)
-		Volume = 5;
-	else if (aVolume < 0)
-		Volume = 0;
-	else
-		Volume = aVolume;
-}
-
+// subscript operator to set volume in valid range (0-5).
 void Alarm::operator[](int aVolume)
 {
-	if (aVolume > 5)
-		Volume = 5;
-	else if (aVolume < 0)
-		Volume = 0;
-	else
-		Volume = aVolume;
+	this->SetVolume(aVolume);
 }
-void Alarm::setRing( string alarmType)
-{
-	if (alarmType == "Melody")
-		AlarmType = Melody;
-	else if (alarmType == "Vibration")
-		AlarmType = Vibration;
-	else if (alarmType == "Melody+Vibration")
-		AlarmType = MelodyAndVibration;
-	else
-		AlarmType = None;
+// end subscript operator
 
-
-}
-
-
+// Function-operator for type conversion.
 Alarm::operator Time() {
-	return Time();
+	return this->GetTime();
 }
+// end function-operator
+
+//============================= OPERATIONS ===================================
+// function that displays alarm
+void Alarm::DisplayAlarm()const
+{
+	cout << "Alarm Time: ";
+	this->Display24();
+	cout << "Volume level: " << this->GetVolume() << endl;
+	cout << "Ringtone: ";
+	cout << this->GetAlarmType() << endl;
+}
+// end function DisplayAlarm
+
+
+//============================= ACESS      ===================================
+
+// function that sets volume of Alarm
+void Alarm::SetVolume(int aVolume) {
+	if (aVolume > 5) {
+		cout << "Voume out of maximum range: Setting it to 5." << endl;
+		this->mVolume = 5;
+	}
+	else if (aVolume < 0) {
+		cout << "Voume below minimum range: Setting it to 0." << endl;
+		this->mVolume = 0;
+	}
+	else
+		this->mVolume = aVolume;
+}
+// end function SetVolume
+
+// function that sets alarm type
+void Alarm::SetAlarmType(const string& aAlarmType) {
+	if (aAlarmType == "Melody")
+		this->mAlarmType = Melody;
+	else if (aAlarmType == "Vibration")
+		this->mAlarmType = Vibration;
+	else if (aAlarmType == "Melody+Vibration")
+		this->mAlarmType = MelodyAndVibration;
+	else
+		this->mAlarmType = None;
+}
+// end function SetAlarmType
+
+// function that sets Alarm
+void Alarm::SetAlarm(int aHour, int aMinute, int aSecond, int aVolume, const string& aRing) {
+	this->SetTime(aHour, aMinute, aSecond);
+	this->SetAlarm(aVolume, aRing);
+}
+// end function SetAlarm
+
+// overloaded function that sets the Alarm
+void Alarm::SetAlarm(int aVolume, const string& aRing){
+	this->SetVolume(aVolume);
+	this->SetAlarmType(aRing);
+}
+// end function SetAlarm
+
+// overloaded function that sets the Alarm
+void Alarm::SetAlarm(const Alarm& aAlarm) {
+	this->SetTime(aAlarm.GetTime());
+	this->SetAlarm(aAlarm.GetVolume(), aAlarm.GetAlarmType());
+}
+// end function SetAlarm
+
+// function that gets volume of Alarm
+int Alarm::GetVolume()const {
+	return this->mVolume;
+}
+// end function GetVolume
+
+// function that gets alarm type
+const string Alarm::GetAlarmType()const {
+	if (this->mAlarmType == Melody)
+		return "Melody";
+	else if (this->mAlarmType == Vibration)
+		return "Vibration";
+	else if (this->mAlarmType == MelodyAndVibration)
+		return "MelodyAndVibration";
+	else
+		return "None";
+}
+// end function GetAlarmType
+
+// function that gets the Alarm
+const Alarm& Alarm::GetAlarm()const {
+	return *this;
+}
+// end function GetAlarm
