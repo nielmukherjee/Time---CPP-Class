@@ -20,8 +20,9 @@ public:
 	*/
 	Time(int = -999, int = -999, int = -999);
 	
-	// Use compiler-generated copy constructor and destructor.
+	// Use compiler-generated copy constructor, assignment, and destructor.
 	// Time(const Time&);
+	// Time& operator=(const Time&);
 	// ~Time();
 
 // OPERATORS
